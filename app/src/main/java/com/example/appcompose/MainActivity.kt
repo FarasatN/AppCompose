@@ -2,8 +2,10 @@ package com.example.appcompose
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.res.Resources.Theme
 import android.net.Uri
 import android.os.Bundle
+import android.widget.Button
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -11,10 +13,29 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
@@ -26,8 +47,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.Delay
+import kotlinx.coroutines.launch
+import java.util.ArrayList
 import java.util.Timer
 import kotlin.random.Random
 
@@ -167,52 +192,148 @@ class MainActivity : ComponentActivity() {
         //--------------------------------
 
 
+//        setContent {
+//            Column(Modifier.fillMaxSize()) {
+//                val color = remember {
+//                    mutableStateOf(Color.Yellow)
+//                }
+//                ColorBox(
+//                    Modifier
+//                        .weight(1f)
+//                        .fillMaxSize()
+//                ){
+//                    color.value = it
+//                }
+//                Box(
+//                    modifier = Modifier
+//                        .background(color.value)
+//                        .weight(1f)
+//                        .fillMaxSize()
+//                )
+//            }
+//        }
+
+
+        //-----------------------------
+
+//        setContent{
+//            val scope = rememberCoroutineScope()
+//            val snackbarHostState = remember { SnackbarHostState() }
+//            Scaffold(
+//                snackbarHost = {
+//                    SnackbarHost(hostState = snackbarHostState)
+//                },
+//                floatingActionButton = {
+//                    ExtendedFloatingActionButton(
+//                        text = { Text("Show snackbar") },
+//                        icon = { Icon(Icons.Filled.Add, contentDescription = "") },
+//                        onClick = {
+//                            scope.launch {
+//                                snackbarHostState.showSnackbar("Snackbar")
+//                            }
+//                        }
+//                    )
+//                },
+//                content = { paddingValues ->
+//                    // Your main content goes here
+//                    Column(
+//                        modifier = Modifier
+//                            .fillMaxSize()
+//                            .padding(paddingValues) // Respect scaffold padding
+//                    ) {
+//                        Text("Hello, World!")
+//                    }
+//                }
+//            )
+//        }
+
+
+        //---------------------
+
         setContent {
-            Column(Modifier.fillMaxSize()) {
-                val color = remember {
-                    mutableStateOf(Color.Yellow)
+//            val scrollState = rememberScrollState()
+//            Column(
+//                modifier = Modifier.verticalScroll(scrollState)
+//            )
+            LazyColumn{
+//                items(5000){
+//                    Text(
+//                        text = "Item $it",
+//                        fontSize = 24.sp,
+//                        fontWeight = FontWeight.Bold,
+//                        textAlign = TextAlign.Center,
+//                        modifier = Modifier.fillMaxWidth()
+//                            .padding(vertical = 24.dp)
+//                    )
+//                }
+
+                val itemList = ArrayList<String>()
+                for (i in 1..5000) {
+                    itemList.add("Item $i")
                 }
-                ColorBox(
-                    Modifier
-                        .weight(1f)
-                        .fillMaxSize()
-                ){
-                    color.value = it
+
+                //replacement recyclerview
+                itemsIndexed(
+//                    listOf("This", "is", "Jetpack","Compose")
+                    itemList
+                ){index, string ->
+                    Text(
+                        text = "At $index:  $string",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                            .padding(vertical = 24.dp)
+                    )
                 }
-                Box(
-                    modifier = Modifier
-                        .background(color.value)
-                        .weight(1f)
-                        .fillMaxSize()
-                )
+
+
+
+//                for (i in 1..500){
+//                    Text(
+//                        text = "Item $i",
+//                        fontSize = 24.sp,
+//                        fontWeight = FontWeight.Bold,
+//                        textAlign = TextAlign.Center,
+//                        modifier = Modifier.fillMaxWidth()
+//                            .padding(vertical = 24.dp)
+//                    )
+//                }
             }
 
-
         }
+
     }
 
 
-    @Composable
-    fun ColorBox(
-        modifier: Modifier = Modifier,
-        updateColor: (Color) -> Unit
-    ) {
-//        val color = remember {
-//            mutableStateOf(Color.Yellow)
-//        }
-        Box(modifier = modifier
-            .background(Color.Red)
-            .clickable {
-                updateColor(
-                    Color(
-                        Random.nextFloat(),
-                        Random.nextFloat(),
-                        Random.nextFloat(),
-                        1f
-                    )
-                )
-            })
-    }
+
+
+
+
+
+
+    //------------------------------
+//    @Composable
+//    fun ColorBox(
+//        modifier: Modifier = Modifier,
+//        updateColor: (Color) -> Unit
+//    ) {
+////        val color = remember {
+////            mutableStateOf(Color.Yellow)
+////        }
+//        Box(modifier = modifier
+//            .background(Color.Red)
+//            .clickable {
+//                updateColor(
+//                    Color(
+//                        Random.nextFloat(),
+//                        Random.nextFloat(),
+//                        Random.nextFloat(),
+//                        1f
+//                    )
+//                )
+//            })
+//    }
 
 
     //-------------------------
