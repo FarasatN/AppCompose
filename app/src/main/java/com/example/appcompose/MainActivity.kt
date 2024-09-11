@@ -38,6 +38,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -48,8 +50,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ChainStyle
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.ConstraintSet
+import androidx.constraintlayout.compose.Dimension
 import kotlinx.coroutines.Delay
 import kotlinx.coroutines.launch
 import java.util.ArrayList
@@ -250,15 +257,35 @@ class MainActivity : ComponentActivity() {
 
         //---------------------
 
-        setContent {
-//            val scrollState = rememberScrollState()
-//            Column(
-//                modifier = Modifier.verticalScroll(scrollState)
-//            )
-            LazyColumn{
-//                items(5000){
+//        setContent {
+////            val scrollState = rememberScrollState()
+////            Column(
+////                modifier = Modifier.verticalScroll(scrollState)
+////            )
+//            LazyColumn{
+////                items(5000){
+////                    Text(
+////                        text = "Item $it",
+////                        fontSize = 24.sp,
+////                        fontWeight = FontWeight.Bold,
+////                        textAlign = TextAlign.Center,
+////                        modifier = Modifier.fillMaxWidth()
+////                            .padding(vertical = 24.dp)
+////                    )
+////                }
+//
+//                val itemList = ArrayList<String>()
+//                for (i in 1..5000) {
+//                    itemList.add("Item $i")
+//                }
+//
+//                //replacement recyclerview
+//                itemsIndexed(
+////                    listOf("This", "is", "Jetpack","Compose")
+//                    itemList
+//                ){index, string ->
 //                    Text(
-//                        text = "Item $it",
+//                        text = "At $index:  $string",
 //                        fontSize = 24.sp,
 //                        fontWeight = FontWeight.Bold,
 //                        textAlign = TextAlign.Center,
@@ -266,43 +293,58 @@ class MainActivity : ComponentActivity() {
 //                            .padding(vertical = 24.dp)
 //                    )
 //                }
+//
+//
+//
+////                for (i in 1..500){
+////                    Text(
+////                        text = "Item $i",
+////                        fontSize = 24.sp,
+////                        fontWeight = FontWeight.Bold,
+////                        textAlign = TextAlign.Center,
+////                        modifier = Modifier.fillMaxWidth()
+////                            .padding(vertical = 24.dp)
+////                    )
+////                }
+//            }
+//
+//        }
 
-                val itemList = ArrayList<String>()
-                for (i in 1..5000) {
-                    itemList.add("Item $i")
+
+        //-------------------------------------------------------
+
+        //ConstraintLayout in Compose
+        setContent{
+            val constraints = ConstraintSet{
+
+                val greenBox = createRefFor("greenBox")
+                val redBox = createRefFor("redBox")
+                val guideline = createGuidelineFromTop(0.5f)
+                constrain(greenBox){
+                    top.linkTo(guideline)
+                    start.linkTo(parent.start)
+                    width = Dimension.value(50.dp)
+                    height = Dimension.value(100.dp)
+                }
+                constrain(redBox){
+                    top.linkTo(parent.top)
+                    start.linkTo(greenBox.end)
+                    width = Dimension.fillToConstraints
+                    height = Dimension.value(50.dp)
                 }
 
-                //replacement recyclerview
-                itemsIndexed(
-//                    listOf("This", "is", "Jetpack","Compose")
-                    itemList
-                ){index, string ->
-                    Text(
-                        text = "At $index:  $string",
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth()
-                            .padding(vertical = 24.dp)
-                    )
-                }
-
-
-
-//                for (i in 1..500){
-//                    Text(
-//                        text = "Item $i",
-//                        fontSize = 24.sp,
-//                        fontWeight = FontWeight.Bold,
-//                        textAlign = TextAlign.Center,
-//                        modifier = Modifier.fillMaxWidth()
-//                            .padding(vertical = 24.dp)
-//                    )
-//                }
+                createHorizontalChain(greenBox,redBox, chainStyle = ChainStyle.Packed)
+            }
+            ConstraintLayout(constraintSet = constraints, modifier = Modifier.fillMaxSize()) {
+                Box(modifier = Modifier
+                    .background(Color.Green)
+                    .layoutId("greenBox"))
+                Box(modifier = Modifier
+                    .background(Color.Red)
+                    .layoutId("redBox"))
             }
 
         }
-
     }
 
 
