@@ -1,26 +1,42 @@
 package com.example.appcompose.ui.theme
 
-import android.app.Activity
 import android.os.Build
+import android.view.Window
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsControllerCompat
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+//    primary = Purple80,
+//    secondary = PurpleGrey80,
+//    tertiary = Pink80
+
+    primary = Color(0xFF1DB954),
+//    primaryVariant = Color(0xFF121212),
+    secondary = Color(0xFF1DB954),
+    background = Color.Black,
+    surface = Color(0xFF1E1E1E),
+    onPrimary = Color.White,
+    onSecondary = Color.White,
+    onBackground = Color.White,
+    onSurface = Color.White,
+    onTertiary = Color.White,
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+//    primary = Purple40,
+//    secondary = PurpleGrey40,
+//    tertiary = Pink40
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
@@ -31,7 +47,19 @@ private val LightColorScheme = lightColorScheme(
     onBackground = Color(0xFF1C1B1F),
     onSurface = Color(0xFF1C1B1F),
     */
-)
+
+    primary = Color(0xFF1DB954),
+//    primaryVariant = Color(0xFF1E1E1E),
+    secondary = Color(0xFF1DB954),
+    background = Color.White,
+    surface = Color.White,
+    onPrimary = Color.Black,
+    onSecondary = Color.Black,
+    onBackground = Color.Black,
+    onSurface = Color.Black,
+    onTertiary = Color.Black,
+
+    )
 
 @Composable
 fun AppComposeTheme(
@@ -53,6 +81,87 @@ fun AppComposeTheme(
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
+        content = content
+    )
+}
+
+//private val DarkColorPalette = darkColors(
+//    primary = Color(0xFF1DB954),
+//    primaryVariant = Color(0xFF121212),
+//    secondary = Color(0xFF1DB954),
+//    background = Color.Black,
+//    surface = Color(0xFF1E1E1E),
+//    onPrimary = Color.White,
+//    onSecondary = Color.White,
+//    onBackground = Color.White,
+//    onSurface = Color.White,
+//)
+//
+//private val LightColorPalette = lightColors(
+//    primary = Color(0xFF1DB954),
+//    primaryVariant = Color(0xFF1E1E1E),
+//    secondary = Color(0xFF1DB954),
+//    background = Color.White,
+//    surface = Color.White,
+//    onPrimary = Color.Black,
+//    onSecondary = Color.Black,
+//    onBackground = Color.Black,
+//    onSurface = Color.Black,
+//)
+
+@Composable
+fun MusicPlayerTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    content: @Composable () -> Unit
+) {
+    val colors = if (darkTheme) {
+        DarkColorScheme
+    } else {
+        LightColorScheme
+    }
+
+    MaterialTheme(
+        colorScheme = colors,
+        typography = Typography,
+        shapes = Shapes(),
+        content = content
+    )
+}
+
+
+
+@Composable
+fun InstagramProfileUITheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    window: Window,
+    content: @Composable () -> Unit
+) {
+    val colors = if (darkTheme) {
+        DarkColorScheme
+    } else {
+        LightColorScheme
+    }
+    // Apply System Bar Colors
+    SideEffect {
+//        WindowCompat.setDecorFitsSystemWindows(window, false)
+        window.statusBarColor = android.graphics.Color.TRANSPARENT
+        window.navigationBarColor = android.graphics.Color.TRANSPARENT
+
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            val controller = WindowInsetsControllerCompat(window, window.decorView)
+//            controller.isAppearanceLightNavigationBars = true
+//            controller.isAppearanceLightStatusBars = true
+//        }
+    }
+
+    // Material Theme
+    MaterialTheme(
+//        colorScheme = MaterialTheme.colorScheme.copy(
+//            background = Color.White
+//        ),
+        colorScheme = colors,
+        typography = Typography,
+        shapes = Shapes(),
         content = content
     )
 }
