@@ -1,9 +1,45 @@
 package com.example.appcompose
 
 import android.os.Bundle
+import android.view.animation.OvershootInterpolator
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.example.appcompose.ui.theme.InstagramProfileUITheme
+import androidx.compose.animation.Animatable
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.estimateAnimationDurationMillis
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.delay
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -387,27 +423,13 @@ class MainActivity : ComponentActivity() {
 //            }
 //        }
 
-        //meditation ui
-//        setContent {
-//            HomeScreen()
-//        }
 
-        //Timer
+//        //meditation ui
 //        setContent {
-////            HomeScreen()
 //
-//            Surface(
-//                color = Color.DarkGray,
-//                modifier = Modifier.fillMaxSize()
-//            ) {
-//                Box(
-//                    contentAlignment = Alignment.Center
-//                ){
-//                    Timer(totalTime = 60L*1000L, handleColor = Color.Green, inactiveBarColor = Color.Gray, activeBarColor = Color.Green, modifier = Modifier.size(250.dp))
-//                }
-//            }
+//            HomeScreen()
+//
 //        }
-
 
         //3D dropdown
 //        setContent {
@@ -416,24 +438,73 @@ class MainActivity : ComponentActivity() {
 //                modifier = Modifier.fillMaxSize()
 //
 //            ) {
-//                Dropdown(text = "Hello", modifier = Modifier.padding(15.dp)) {
-//                    Text(text = "This is now revealed!",
-//                        modifier = Modifier.fillMaxWidth().height(100.dp).background(Color.Green))
-//                }
+////                Dropdown(text = ) {
+////
+////                }
 //            }
 //        }
 
-        //Instagram UI------------------
-        setContent {
-            InstagramProfileUITheme(window = window) {
-                ProfileScreen()
+        //Splash Screen
+        setContent{
+            Surface(modifier = Modifier.fillMaxSize()) {
+                Navigation()
             }
-
         }
+
 
     }
 
-    //Instagram UI------------------
+    //Splash Screen
+    @Composable
+    fun Navigation(){
+        val navController = rememberNavController()
+        NavHost(navController = navController, startDestination = "splash_screen"){
+            composable("splash_screen"){
+                SplashScreen(navController = navController)
+            }
+            composable("main_screen"){
+                val isDarkMode = isSystemInDarkTheme()
+
+                val backgroundColor = if (isDarkMode) Color.DarkGray else Color(0xFFFDCEED)
+                Box(modifier = Modifier.fillMaxSize().background(backgroundColor), contentAlignment = Alignment.Center){
+                    Text(modifier = Modifier.padding(14.dp),text = "Səni bu həyatda hamıdan və hər şeydən çox sevirəm, __!\n\n \uD83C\uDF39☺", color = Color.Red, fontWeight = FontWeight.Bold,fontStyle = FontStyle.Italic,fontFamily = FontFamily.Cursive, fontSize = 32.sp, textAlign = TextAlign.Center)
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun SplashScreen(navController: NavController) {
+        val scale = remember { androidx.compose.animation.core.Animatable(0f) }
+
+
+        LaunchedEffect(Unit) {
+            // Animate scaling
+            scale.animateTo(
+                targetValue = 4.2f,
+                animationSpec = tween(
+                    durationMillis = 800,
+                    easing = LinearOutSlowInEasing
+                )
+            )
+            delay(3000L)
+            navController.navigate("main_screen")
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(color = Color(0xFFFDCEED)), // Dynamic background color
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.hearts2),
+                contentDescription = "Heart Image",
+//                colorFilter = ColorFilter.tint(heartTintColor), // Dynamic tint for the heart
+                modifier = Modifier.scale(scale.value)
+            )
+        }
+    }
 
 
 
@@ -444,27 +515,29 @@ class MainActivity : ComponentActivity() {
 //        modifier: Modifier = Modifier,
 //        initiallyOpened: Boolean=false,
 //        content: @Composable () -> Unit
-//    )
-//    {
+//    ) {
 //
-//        var isOpen by remember{
+//        var isOpen by remember {
 //            mutableStateOf(initiallyOpened)
 //        }
 //
 //        val alpha = animateFloatAsState(
-//            targetValue = if(isOpen) 1f else 0f,
+//            targetValue = if (isOpen) 1f else 0f,
 //            animationSpec = tween(
 //                durationMillis = 300
-//            ))
+//            )
+//        )
 //        val rotateX = animateFloatAsState(
-//            targetValue = if(isOpen) 0f else -90f,
+//            targetValue = if (isOpen) 0f else -90f,
 //            animationSpec = tween(
 //                durationMillis = 300
-//            ))
+//            )
+//        )
 //
-//        Column(modifier = modifier
-//            .fillMaxWidth()
-//        ){
+//        Column(
+//            modifier = modifier
+//                .fillMaxWidth()
+//        ) {
 //            Row(
 //                horizontalArrangement = Arrangement.SpaceBetween,
 //                verticalAlignment = Alignment.CenterVertically,
@@ -474,7 +547,8 @@ class MainActivity : ComponentActivity() {
 //                Text(
 //                    text = text,
 //                    color = Color.White,
-//                    fontSize = 16.sp)
+//                    fontSize = 16.sp
+//                )
 //                Icon(
 //                    imageVector = Icons.Default.ArrowDropDown,
 //                    contentDescription = "Open or close the drop down",
@@ -496,118 +570,15 @@ class MainActivity : ComponentActivity() {
 //                        rotationX = rotateX.value
 //                    }
 //                    .alpha(alpha.value)
-//            ){
-////                Text(text="Hello", fontSize = 36.sp,modifier = Modifier.align(Alignment.Center))
-//                content()
-//            }
-//        }
-//    }
-
-//    //Timer-------------------
-//    @Composable
-//    fun Timer(
-//        totalTime: Long,
-//        handleColor:  Color,
-//        inactiveBarColor: Color,
-//        activeBarColor: Color,
-//        modifier: Modifier = Modifier,
-//        initialValue: Float = 1f,
-//        strokeWidth: Dp = 5.dp,
-//
-//    ){
-//        var size by remember {
-//            mutableStateOf(IntSize.Zero)
-//        }
-//        var value by remember {
-//            mutableStateOf(initialValue)
-//        }
-//        var currentTime by remember {
-//            mutableStateOf(totalTime)
-//        }
-//        var isTimerRunning by remember{
-//            mutableStateOf(false)
-//        }
-//        LaunchedEffect(key1 = currentTime, key2 = isTimerRunning) {
-//            if (currentTime>0 && isTimerRunning){
-//                delay(100L)
-//                currentTime -= 100L
-//                value = currentTime/totalTime.toFloat()
-//            }
-//        }
-//        Box(
-//            contentAlignment = Alignment.Center,
-//            modifier = Modifier
-//                .onSizeChanged {
-//                    size = it
-//                }
-//        ){
-//            Canvas(modifier = modifier) {
-//                drawArc(
-//                    color = inactiveBarColor,
-//                    startAngle = -215f,
-//                    sweepAngle = 250f,
-//                    useCenter = false,
-//                    size = Size(size.width.toFloat(), size.height.toFloat()),
-//                    style = Stroke(strokeWidth.toPx(),cap = StrokeCap.Round)
-//                )
-//                drawArc(
-//                    color = activeBarColor,
-//                    startAngle = -215f,
-//                    sweepAngle = 250f*value,
-//                    useCenter = false,
-//                    size = Size(size.width.toFloat(), size.height.toFloat()),
-//                    style = Stroke(strokeWidth.toPx(),cap = StrokeCap.Round)
-//                )
-//                val center = Offset(size.width/2f,size.height/2f)
-//                val beta = (250f*value+145f) * (PI/180f).toFloat()
-//                val r = size.width/2f
-//                val a = cos(beta)*r
-//                val b = sin(beta)*r
-//                drawPoints(
-//                    listOf(Offset(center.x+a,center.y+b)),
-//                    pointMode = PointMode.Points,
-//                    color = handleColor,
-//                    strokeWidth = (strokeWidth*3f).toPx(),
-//                    cap = StrokeCap.Round
-//                )
-//            }
-//
-//            Text(
-//                text = (currentTime/1000L).toString(),
-//                fontSize = 44.sp,
-//                fontWeight = FontWeight.Bold,
-//                color = Color.White
-//            )
-//
-//            Button(
-//                onClick = {
-//                    if (currentTime<=0L){
-//                        currentTime = totalTime
-//                        isTimerRunning = true
-//                    }else{
-//                        isTimerRunning = !isTimerRunning
-//                    }
-//                },
-//                modifier = Modifier.align(Alignment.BottomCenter),
-//                colors = ButtonDefaults.buttonColors(
-//                    containerColor =
-//                    if(!isTimerRunning || currentTime <= 0L){
-//                          Color.Green
-//                    }else{
-//                          Color.Red
-//                    }
-//                )
 //            ) {
-//                Text(text = if (isTimerRunning && currentTime >= 0L) "Stop"
-//                    else if(!isTimerRunning && currentTime >= 0L) "Start"
-//                    else "Restart")
+//
 //            }
 //        }
 //    }
+//
 
-
-    //--------------------
-    //Meditation ui
+        //--------------------
+        //Meditation ui
 //    @Composable
 //    fun HomeScreen() {
 //        Box(
@@ -1016,8 +987,8 @@ class MainActivity : ComponentActivity() {
 //        }
 //    }
 
-    //-----------------
-    //draggable music
+        //-----------------
+        //draggable music
 //    @Composable
 //    fun MusicPlayerUI() {
 //        // State to manage play/pause and track name
@@ -1129,8 +1100,8 @@ class MainActivity : ComponentActivity() {
 //    }
 
 
-    //------------------
-    //Circular Progress bar
+        //------------------
+        //Circular Progress bar
 //    @Composable
 //    fun CircularProgressBar(
 //        percentage: Float,
@@ -1179,8 +1150,8 @@ class MainActivity : ComponentActivity() {
 //            )
 //        }
 
-    //-----------------------------------
-    //Draggable Music animation
+        //-----------------------------------
+        //Draggable Music animation
 
 
 //------------------------------
@@ -1292,4 +1263,4 @@ class MainActivity : ComponentActivity() {
 //    }
 
 
-}
+    }

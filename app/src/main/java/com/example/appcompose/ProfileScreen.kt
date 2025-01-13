@@ -111,22 +111,22 @@ fun ProfileScreen() {
         Spacer(modifier = Modifier.height(18.dp))
         PostTabView(
             imageWithTexts = listOf(
-                ImageWithText(
-                    image = painterResource(id = R.drawable.baseline_grid_4x4_24),
-                    text = "Posts"
-                ),
-                ImageWithText(
-                    image = painterResource(id = R.drawable.baseline_grid_4x4_24),
-                    text = "Reels"
-                ),
-                ImageWithText(
-                    image = painterResource(id = R.drawable.baseline_grid_4x4_24),
-                    text = "IGTV"
-                ),
-                ImageWithText(
-                    image = painterResource(id = R.drawable.baseline_grid_4x4_24),
-                    text = "Profile"
-                ),
+//                ImageWithText(
+//                    image = painterResource(id = R.drawable.baseline_grid_4x4_24),
+//                    text = "Posts"
+//                ),
+//                ImageWithText(
+//                    image = painterResource(id = R.drawable.baseline_grid_4x4_24),
+//                    text = "Reels"
+//                ),
+//                ImageWithText(
+//                    image = painterResource(id = R.drawable.baseline_grid_4x4_24),
+//                    text = "IGTV"
+//                ),
+//                ImageWithText(
+//                    image = painterResource(id = R.drawable.baseline_grid_4x4_24),
+//                    text = "Profile"
+//                ),
             ),
         ) {
             selectedTabIndex = it
@@ -176,18 +176,18 @@ fun TopBar(
             fontWeight = FontWeight.Bold,
             fontSize = 20.sp
         )
-        Icon(
-            painter = painterResource(id = R.drawable.baseline_notifications_24),
-            contentDescription = "Back",
-            tint = Color.Black,
-            modifier = Modifier.size(24.dp)
-        )
-        Icon(
-            painter = painterResource(id = R.drawable.baseline_menu_24),
-            contentDescription = "Back",
-            tint = Color.Black,
-            modifier = Modifier.size(24.dp)
-        )
+//        Icon(
+//            painter = painterResource(id = R.drawable.baseline_notifications_24),
+//            contentDescription = "Back",
+//            tint = Color.Black,
+//            modifier = Modifier.size(24.dp)
+//        )
+//        Icon(
+//            painter = painterResource(id = R.drawable.baseline_menu_24),
+//            contentDescription = "Back",
+//            tint = Color.Black,
+//            modifier = Modifier.size(24.dp)
+//        )
 
     }
 }
@@ -201,12 +201,12 @@ fun ProfileSection(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(horizontal = 20.dp)
         ) {
-            RoundImage(
-                image = painterResource(id = R.drawable.ic_profile),
-                modifier = Modifier
-                    .size(75.dp)
-                    .weight(3f)
-            )
+//            RoundImage(
+//                image = painterResource(id = R.drawable.ic_profile),
+//                modifier = Modifier
+//                    .size(75.dp)
+//                    .weight(3f)
+//            )
             Spacer(modifier = Modifier.width(16.dp))
             StatSection(modifier = Modifier.weight(7f))
 
