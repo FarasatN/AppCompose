@@ -467,7 +467,7 @@ class MainActivity : ComponentActivity() {
 
                 val backgroundColor = if (isDarkMode) Color.DarkGray else Color(0xFFFDCEED)
                 Box(modifier = Modifier.fillMaxSize().background(backgroundColor), contentAlignment = Alignment.Center){
-                    Text(modifier = Modifier.padding(14.dp),text = "Səni bu həyatda hamıdan və hər şeydən çox sevirəm, __!\n\n \uD83C\uDF39☺", color = Color.Red, fontWeight = FontWeight.Bold,fontStyle = FontStyle.Italic,fontFamily = FontFamily.Cursive, fontSize = 32.sp, textAlign = TextAlign.Center)
+//                    Text(modifier = Modifier.padding(14.dp),text = "Səni bu həyatda hamıdan və hər şeydən çox sevirəm, __!\n\n \uD83C\uDF39☺", color = Color.Red, fontWeight = FontWeight.Bold,fontStyle = FontStyle.Italic,fontFamily = FontFamily.Cursive, fontSize = 32.sp, textAlign = TextAlign.Center)
                 }
             }
         }
