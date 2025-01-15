@@ -1,5 +1,6 @@
 package com.example.appcompose
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.animation.OvershootInterpolator
 import androidx.activity.ComponentActivity
@@ -14,9 +15,27 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Face
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,21 +46,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.selects.select
 
 class MainActivity : ComponentActivity() {
+    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 //        enableEdgeToEdge()
@@ -445,67 +470,315 @@ class MainActivity : ComponentActivity() {
 //        }
 
         //Splash Screen
+//        setContent{
+//            Surface(modifier = Modifier.fillMaxSize()) {
+//                Navigation()
+//            }
+//        }
+
+
+        //Bottom Navigation
+        /*        Material3 changes:
+                - BottomNavigation() is now NavigationBar(),
+                - background= is now containerColor=,
+                - elevation= is now tonalElevation=.
+                - BottomNavigationItem() is now NavigationBarItem()
+                - Handle the selectedContentColor and unselectedContentColor like this:
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = Color .Green,
+                    unselectedIconColor = Color.Gray
+                )
+                -BadgeBox() is now BadgedBox()
+                -use BadgedBox( badge = { Badge { Text(item.badgeCount.toString()) } } )
+        */
+
+
+//        setContent {
+//            val navController = rememberNavController()
+//            Scaffold(
+//                bottomBar = {
+//                    BottomNavBar(
+//                        items = listOf(
+//                            BottomNavItem(
+//                                name = "Home",
+//                                route = "home",
+//                                icon = Icons.Default.Home
+//                            ),
+//                            BottomNavItem(
+//                                name = "Chat",
+//                                route = "chat",
+//                                icon = Icons.Default.Face,
+//                                badgeCount = 11
+//                            ),
+//                            BottomNavItem(
+//                                name = "Settings",
+//                                route = "settings",
+//                                icon = Icons.Default.Settings,
+//                                badgeCount = 11
+//
+//                            ),
+//
+//                            ),
+//                        navController = navController,
+//                        onItemClick = {
+//                            navController.navigate(it.route)
+//                        }
+//                    )
+//                }
+//            ) {
+//                Nav(navCont = navController)
+//            }
+//        }
+
+
         setContent{
-            Surface(modifier = Modifier.fillMaxSize()) {
-                Navigation()
-            }
+//            MultiLayerParallaxScreen()
+
         }
-
-
     }
+
+    //Mutli Select
+
+
+    //Parallax
+
+//    @Composable
+//    fun MultiLayerParallaxScreen() {
+//        val scrollState = rememberScrollState() // To capture scroll offset
+//
+//        Box(modifier = Modifier.fillMaxSize()) {
+//            // Background Layer (Sky)
+//            ParallaxLayer(scrollOffset = scrollState.value, speed = 0.3f) {
+//                val painter = runCatching {
+//                    painterResource(id = R.drawable.cups2)
+//                }.getOrDefault(painterResource(id = R.drawable.ic_launcher_background))
+//
+//                Image(
+//                    painter = painter,
+//                    contentDescription = "Sky",
+//                    contentScale = ContentScale.Crop,
+//                    modifier = Modifier.fillMaxSize()
+//                )
+//            }
+//
+//            // Midground Layer (Mountains)
+//            ParallaxLayer(scrollOffset = scrollState.value, speed = 0.6f) {
+//                val painter = runCatching {
+//                    painterResource(id = R.drawable.cups2)
+//                }.getOrDefault(painterResource(id = R.drawable.ic_launcher_background))
+//
+//                Image(
+//                    painter = painter,
+//                    contentDescription = "Mountains",
+//                    contentScale = ContentScale.Crop,
+//                    modifier = Modifier.fillMaxSize()
+//                )
+//            }
+//
+//            // Foreground Layer (Trees)
+//            ParallaxLayer(scrollOffset = scrollState.value, speed = 1.0f) {
+//                val painter = runCatching {
+//                    painterResource(id = R.drawable.hearts2)
+//                }.getOrDefault(painterResource(id = R.drawable.ic_launcher_foreground))
+//
+//                Image(
+//
+//                    painter = painter,
+//                    contentDescription = "Trees",
+//                    contentScale = ContentScale.Crop,
+//                    modifier = Modifier.fillMaxSize()
+//                )
+//            }
+//
+//            // Foreground Scrollable Content
+//            Column(
+//                modifier = Modifier
+//                    .fillMaxSize()
+//                    .verticalScroll(scrollState)
+//                    .padding(top = 300.dp) // To prevent content from overlapping layers
+//            ) {
+//                repeat(50) { index ->
+//                    Box(
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .height(100.dp)
+//                            .padding(8.dp)
+//                            .background(Color.Gray)
+//                    ) {
+//                        Text(text = "Item $index", modifier = Modifier.align(Alignment.Center))
+//                    }
+//                }
+//            }
+//        }
+//    }
+//
+//    @Composable
+//    fun ParallaxLayer(
+//        scrollOffset: Int,
+//        speed: Float,
+//        content: @Composable BoxScope.() -> Unit
+//    ) {
+//        Box(
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .offset(y = (scrollOffset * speed).toInt().dp),
+//            content = content
+//        )
+//    }
+
+
+    //Bottom Nav
+//    @Composable
+//    fun Nav(navCont: NavHostController) {
+////        Hi Philipp, thanks for this video, in addition to this video add this navController.navigate(item.route) {
+////            navController.graph.startDestinationRoute?.let { route ->
+////                popUpTo(route) {
+////                    saveState = true
+////                }
+////            }
+////            launchSingleTop = true
+////            restoreState = true
+////        } inside onClick method instead of navController.navigate(item.route) to restore state, and clear back entries, I hope this will helps for someone
+//
+//        NavHost(navController = navCont, startDestination = "home") {
+//            composable("home") {
+//                Home()
+//            }
+//            composable("chat") {
+//                Chat()
+//            }
+//            composable("settings") {
+//                Settings()
+//            }
+//
+//        }
+//    }
+//    @Composable
+//    fun Home() {
+//        Box(
+//            modifier = Modifier.fillMaxSize(),
+//            contentAlignment = Alignment.Center
+//        ) {
+//            Text(text = "Home Screen")
+//        }
+//    }
+//    @Composable
+//    fun Chat() {
+//        Box(
+//            modifier = Modifier.fillMaxSize(),
+//            contentAlignment = Alignment.Center
+//        ) {
+//            Text(text = "Home Screen")
+//        }
+//    }
+//    @Composable
+//    fun Settings() {
+//        Box(
+//            modifier = Modifier.fillMaxSize(),
+//            contentAlignment = Alignment.Center
+//        ) {
+//            Text(text = "Home Screen")
+//        }
+//    }
+//    @Composable
+//    fun BottomNavBar(
+//        items: List<BottomNavItem>,
+//        navController: NavController,
+//        modifier: Modifier = Modifier,
+//        onItemClick: (BottomNavItem) -> Unit
+//    ) {
+//        val backStackEntry = navController.currentBackStackEntryAsState()
+//        NavigationBar(
+//            modifier = Modifier,
+//            containerColor = Color.DarkGray,
+//            tonalElevation = 5.dp
+//        ) {
+//            items.forEach { item ->
+//                val selected = item.route == backStackEntry.value?.destination?.route
+//                NavigationBarItem(
+//                    selected = selected,
+//                    onClick = { onItemClick(item) },
+//                    colors = NavigationBarItemDefaults.colors(
+//                        selectedIconColor = Color.Green,
+//                        unselectedIconColor = Color.Gray
+//                    ),
+//                    icon = {
+//                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+//                            if (item.badgeCount > 0) {
+//                                BadgedBox(
+//                                    badge = { Badge { Text(item.badgeCount.toString()) } }
+//                                ) {
+//                                    Icon(imageVector = item.icon, contentDescription = item.name)
+//                                }
+//                            } else {
+//                                Icon(imageVector = item.icon, contentDescription = item.name)
+//                            }
+//                            if (selected) {
+//                                Text(
+//                                    text = item.name,
+//                                    textAlign = TextAlign.Center,
+//                                    fontSize = 10.sp
+//                                )
+//                            }
+//                        }
+//                    }
+//                )
+//            }
+//        }
+//    }
+
 
     //Splash Screen
-    @Composable
-    fun Navigation(){
-        val navController = rememberNavController()
-        NavHost(navController = navController, startDestination = "splash_screen"){
-            composable("splash_screen"){
-                SplashScreen(navController = navController)
-            }
-            composable("main_screen"){
-                val isDarkMode = isSystemInDarkTheme()
-
-                val backgroundColor = if (isDarkMode) Color.DarkGray else Color(0xFFFDCEED)
-                Box(modifier = Modifier.fillMaxSize().background(backgroundColor), contentAlignment = Alignment.Center){
-//                    Text(modifier = Modifier.padding(14.dp),text = "Səni bu həyatda hamıdan və hər şeydən çox sevirəm, __!\n\n \uD83C\uDF39☺", color = Color.Red, fontWeight = FontWeight.Bold,fontStyle = FontStyle.Italic,fontFamily = FontFamily.Cursive, fontSize = 32.sp, textAlign = TextAlign.Center)
-                }
-            }
-        }
-    }
-
-    @Composable
-    fun SplashScreen(navController: NavController) {
-        val scale = remember { androidx.compose.animation.core.Animatable(0f) }
-
-
-        LaunchedEffect(Unit) {
-            // Animate scaling
-            scale.animateTo(
-                targetValue = 4.2f,
-                animationSpec = tween(
-                    durationMillis = 800,
-                    easing = LinearOutSlowInEasing
-                )
-            )
-            delay(3000L)
-            navController.navigate("main_screen")
-        }
-
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(color = Color(0xFFFDCEED)), // Dynamic background color
-            contentAlignment = Alignment.Center
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.hearts2),
-                contentDescription = "Heart Image",
-//                colorFilter = ColorFilter.tint(heartTintColor), // Dynamic tint for the heart
-                modifier = Modifier.scale(scale.value)
-            )
-        }
-    }
-
+//    @Composable
+//    fun Navigation(){
+//        val navController = rememberNavController()
+//        NavHost(navController = navController, startDestination = "splash_screen"){
+//            composable("splash_screen"){
+//                SplashScreen(navController = navController)
+//            }
+//            composable("main_screen"){
+//                val isDarkMode = isSystemInDarkTheme()
+//
+//                val backgroundColor = if (isDarkMode) Color.DarkGray else Color(0xFFFDCEED)
+//                Box(modifier = Modifier.fillMaxSize().background(backgroundColor), contentAlignment = Alignment.Center){
+////                    Text(modifier = Modifier.padding(14.dp),text = "Səni bu həyatda hamıdan və hər şeydən çox sevirəm, __!\n\n \uD83C\uDF39☺", color = Color.Red, fontWeight = FontWeight.Bold,fontStyle = FontStyle.Italic,fontFamily = FontFamily.Cursive, fontSize = 32.sp, textAlign = TextAlign.Center)
+//                }
+//            }
+//        }
+//    }
+//
+//    @Composable
+//    fun SplashScreen(navController: NavController) {
+//        val scale = remember { androidx.compose.animation.core.Animatable(0f) }
+//
+//
+//        LaunchedEffect(Unit) {
+//            // Animate scaling
+//            scale.animateTo(
+//                targetValue = 4.2f,
+//                animationSpec = tween(
+//                    durationMillis = 800,
+//                    easing = LinearOutSlowInEasing
+//                )
+//            )
+//            delay(3000L)
+//            navController.navigate("main_screen")
+//        }
+//
+//        Box(
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .background(color = Color(0xFFFDCEED)), // Dynamic background color
+//            contentAlignment = Alignment.Center
+//        ) {
+//            Image(
+//                painter = painterResource(id = R.drawable.hearts2),
+//                contentDescription = "Heart Image",
+////                colorFilter = ColorFilter.tint(heartTintColor), // Dynamic tint for the heart
+//                modifier = Modifier.scale(scale.value)
+//            )
+//        }
+//    }
 
 
     //3D dropdown
@@ -577,8 +850,8 @@ class MainActivity : ComponentActivity() {
 //    }
 //
 
-        //--------------------
-        //Meditation ui
+    //--------------------
+    //Meditation ui
 //    @Composable
 //    fun HomeScreen() {
 //        Box(
@@ -987,8 +1260,8 @@ class MainActivity : ComponentActivity() {
 //        }
 //    }
 
-        //-----------------
-        //draggable music
+    //-----------------
+    //draggable music
 //    @Composable
 //    fun MusicPlayerUI() {
 //        // State to manage play/pause and track name
@@ -1100,8 +1373,8 @@ class MainActivity : ComponentActivity() {
 //    }
 
 
-        //------------------
-        //Circular Progress bar
+    //------------------
+    //Circular Progress bar
 //    @Composable
 //    fun CircularProgressBar(
 //        percentage: Float,
@@ -1150,8 +1423,8 @@ class MainActivity : ComponentActivity() {
 //            )
 //        }
 
-        //-----------------------------------
-        //Draggable Music animation
+    //-----------------------------------
+    //Draggable Music animation
 
 
 //------------------------------
@@ -1263,4 +1536,4 @@ class MainActivity : ComponentActivity() {
 //    }
 
 
-    }
+}
