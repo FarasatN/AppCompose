@@ -13,19 +13,24 @@ import androidx.compose.animation.core.estimateAnimationDurationMillis
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
@@ -40,7 +45,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -531,16 +539,49 @@ class MainActivity : ComponentActivity() {
 //        }
 
 
-        setContent{
+        setContent {
 //            MultiLayerParallaxScreen()
+            var items by remember {
+                mutableStateOf(
+                    (1..20).map {
+                        ListItem(
+                            title = "Item $it",
+                            isSelected = false
+                        )
+                    })
+            }
 
-        }
+//            items.filter { it.isSelected } //if you wanna selected items
+            LazyColumn(modifier = Modifier.fillMaxSize()){
+                    items(items.size){i ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    items = items.mapIndexed{ j, item ->
+                                        if(i==j){
+                                            item.copy(isSelected = !item.isSelected)
+                                        }else item
+                                    }
+                                }
+                                .padding(16.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ){
+                            Text(text = items[i].title)
+                            if(items[i].isSelected){
+                                Icon(imageVector = Icons.Default.Check, contentDescription = "Selected", tint = Color.Green, modifier = Modifier.size(20.dp))
+                            }
+                        }
+                    }
+            }
     }
+}
 
-    //Mutli Select
+//Mutli Select
 
 
-    //Parallax
+//Parallax
 
 //    @Composable
 //    fun MultiLayerParallaxScreen() {
@@ -627,7 +668,7 @@ class MainActivity : ComponentActivity() {
 //    }
 
 
-    //Bottom Nav
+//Bottom Nav
 //    @Composable
 //    fun Nav(navCont: NavHostController) {
 ////        Hi Philipp, thanks for this video, in addition to this video add this navController.navigate(item.route) {
@@ -728,7 +769,7 @@ class MainActivity : ComponentActivity() {
 //    }
 
 
-    //Splash Screen
+//Splash Screen
 //    @Composable
 //    fun Navigation(){
 //        val navController = rememberNavController()
@@ -781,7 +822,7 @@ class MainActivity : ComponentActivity() {
 //    }
 
 
-    //3D dropdown
+//3D dropdown
 //    @Composable
 //    fun Dropdown(
 //        text: String,
@@ -850,8 +891,8 @@ class MainActivity : ComponentActivity() {
 //    }
 //
 
-    //--------------------
-    //Meditation ui
+//--------------------
+//Meditation ui
 //    @Composable
 //    fun HomeScreen() {
 //        Box(
@@ -1260,8 +1301,8 @@ class MainActivity : ComponentActivity() {
 //        }
 //    }
 
-    //-----------------
-    //draggable music
+//-----------------
+//draggable music
 //    @Composable
 //    fun MusicPlayerUI() {
 //        // State to manage play/pause and track name
@@ -1373,8 +1414,8 @@ class MainActivity : ComponentActivity() {
 //    }
 
 
-    //------------------
-    //Circular Progress bar
+//------------------
+//Circular Progress bar
 //    @Composable
 //    fun CircularProgressBar(
 //        percentage: Float,
@@ -1423,8 +1464,8 @@ class MainActivity : ComponentActivity() {
 //            )
 //        }
 
-    //-----------------------------------
-    //Draggable Music animation
+//-----------------------------------
+//Draggable Music animation
 
 
 //------------------------------
