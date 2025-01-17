@@ -2,78 +2,28 @@ package com.example.appcompose
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.view.animation.OvershootInterpolator
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.Animatable
-import androidx.compose.animation.core.FastOutLinearInEasing
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.estimateAnimationDurationMillis
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Face
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Badge
-import androidx.compose.material3.BadgedBox
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontVariation
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.selects.select
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import com.google.accompanist.permissions.shouldShowRationale
 
 class MainActivity : ComponentActivity() {
+    @OptIn(ExperimentalPermissionsApi::class)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -539,44 +489,166 @@ class MainActivity : ComponentActivity() {
 //        }
 
 
-        setContent {
-//            MultiLayerParallaxScreen()
-            var items by remember {
-                mutableStateOf(
-                    (1..20).map {
-                        ListItem(
-                            title = "Item $it",
-                            isSelected = false
-                        )
-                    })
-            }
+//        setContent {
+////            MultiLayerParallaxScreen()
+//            var items by remember {
+//                mutableStateOf(
+//                    (1..20).map {
+//                        ListItem(
+//                            title = "Item $it",
+//                            isSelected = false
+//                        )
+//                    })
+//            }
+//
+////            items.filter { it.isSelected } //if you wanna selected items
+//            LazyColumn(modifier = Modifier.fillMaxSize()){
+//                    items(items.size){i ->
+//                        Row(
+//                            modifier = Modifier
+//                                .fillMaxWidth()
+//                                .clickable {
+//                                    items = items.mapIndexed{ j, item ->
+//                                        if(i==j){
+//                                            item.copy(isSelected = !item.isSelected)
+//                                        }else item
+//                                    }
+//                                }
+//                                .padding(16.dp),
+//                            horizontalArrangement = Arrangement.SpaceBetween,
+//                            verticalAlignment = Alignment.CenterVertically
+//                        ){
+//                            Text(text = items[i].title)
+//                            if(items[i].isSelected){
+//                                Icon(imageVector = Icons.Default.Check, contentDescription = "Selected", tint = Color.Green, modifier = Modifier.size(20.dp))
+//                            }
+//                        }
+//                    }
+//            }
 
-//            items.filter { it.isSelected } //if you wanna selected items
-            LazyColumn(modifier = Modifier.fillMaxSize()){
-                    items(items.size){i ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    items = items.mapIndexed{ j, item ->
-                                        if(i==j){
-                                            item.copy(isSelected = !item.isSelected)
-                                        }else item
-                                    }
+
+        //Permission
+        setContent {
+//            MultiplePermissionsHandler()
+
+            val permissionsState = rememberMultiplePermissionsState(
+                permissions = listOf(
+                    android.Manifest.permission.CAMERA,
+                    android.Manifest.permission.RECORD_AUDIO
+                )
+            )
+            val lifecycleOwner = LocalLifecycleOwner.current
+            DisposableEffect(
+                key1 = lifecycleOwner,
+                effect = {
+                    val observer = LifecycleEventObserver { _, event ->
+                        if (event == Lifecycle.Event.ON_RESUME) {
+                            permissionsState.launchMultiplePermissionRequest()
+                        }
+                    }
+                    lifecycleOwner.lifecycle.addObserver(observer)
+                    onDispose {
+                        lifecycleOwner.lifecycle.removeObserver(observer)
+                    }
+                }
+
+            )
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                permissionsState.permissions.forEach { perm ->
+                    when (perm.permission) {
+                        android.Manifest.permission.CAMERA -> {
+                            when {
+                                perm.status.isGranted -> {
+                                    Log.d("P", "PERMISSION GRANTED")
+                                    Text("Camera permission accepted")
+
                                 }
-                                .padding(16.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ){
-                            Text(text = items[i].title)
-                            if(items[i].isSelected){
-                                Icon(imageVector = Icons.Default.Check, contentDescription = "Selected", tint = Color.Green, modifier = Modifier.size(20.dp))
+
+                                perm.status.shouldShowRationale -> {
+                                    Log.d("P", "PERMISSION NEEDED")
+                                    Text("Camera permission is needed to access camera")
+                                }
+
+                                !perm.isPermanentlyDenied() -> {
+                                    Log.d("P", "PERMISSION DENIED")
+                                    Text("Camera permission was permanently denied.You can enable it in app settings.")
+                                }
+                            }
+                        }
+
+                        android.Manifest.permission.RECORD_AUDIO -> {
+                            when {
+                                perm.status.isGranted -> {
+                                    Log.d("P", "PERMISSION GRANTED")
+                                    Text("Record permission accepted")
+
+                                }
+
+                                perm.status.shouldShowRationale -> {
+                                    Log.d("P", "PERMISSION NEEDED")
+                                    Text("Record permission is needed to access camera")
+                                }
+
+                                !perm.isPermanentlyDenied() -> {
+                                    Log.d("P", "PERMISSION DENIED")
+                                    Text("Record permission was permanently denied.You can enable it in app settings.")
+                                }
                             }
                         }
                     }
+                }
             }
+
+        }
+
     }
-}
+
+    //Permission Handling
+//    @OptIn(ExperimentalPermissionsApi::class)
+//    @Composable
+//    fun MultiplePermissionsHandler() {
+//        val permissionsState = rememberMultiplePermissionsState(
+//            listOf(
+//                android.Manifest.permission.CAMERA,
+//                android.Manifest.permission.RECORD_AUDIO
+//            )
+//        )
+//
+//        Column(
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .padding(16.dp),
+//            verticalArrangement = Arrangement.Center,
+//            horizontalAlignment = Alignment.CenterHorizontally
+//        ) {
+//            when {
+//                permissionsState.allPermissionsGranted -> {
+//                    Text("All permissions granted!")
+//                }
+//                permissionsState.shouldShowRationale -> {
+//                    Text("Permissions are needed to proceed.")
+//                    Spacer(modifier = Modifier.height(8.dp))
+//                    Button(onClick = { permissionsState.launchMultiplePermissionRequest() }) {
+//                        Text("Grant Permissions")
+//                    }
+//                }
+//                else -> {
+//                    Text("Permissions not granted. Please enable them in settings.")
+//                    Spacer(modifier = Modifier.height(8.dp))
+//                    Button(onClick = { permissionsState.launchMultiplePermissionRequest() }) {
+//                        Text("Request Permissions")
+//                    }
+//                }
+//            }
+//        }
+//    }
+
 
 //Mutli Select
 
