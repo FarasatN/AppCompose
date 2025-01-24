@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
@@ -528,86 +529,98 @@ class MainActivity : ComponentActivity() {
 
 
         //Permission
+//        setContent {
+////            MultiplePermissionsHandler()
+//
+//            val permissionsState = rememberMultiplePermissionsState(
+//                permissions = listOf(
+//                    android.Manifest.permission.CAMERA,
+//                    android.Manifest.permission.RECORD_AUDIO
+//                )
+//            )
+//            val lifecycleOwner = LocalLifecycleOwner.current
+//            DisposableEffect(
+//                key1 = lifecycleOwner,
+//                effect = {
+//                    val observer = LifecycleEventObserver { _, event ->
+//                        if (event == Lifecycle.Event.ON_RESUME) {
+//                            permissionsState.launchMultiplePermissionRequest()
+//                        }
+//                    }
+//                    lifecycleOwner.lifecycle.addObserver(observer)
+//                    onDispose {
+//                        lifecycleOwner.lifecycle.removeObserver(observer)
+//                    }
+//                }
+//
+//            )
+//            Column(
+//                modifier = Modifier
+//                    .fillMaxSize()
+//                    .padding(16.dp),
+//                verticalArrangement = Arrangement.Center,
+//                horizontalAlignment = Alignment.CenterHorizontally
+//            ) {
+//                permissionsState.permissions.forEach { perm ->
+//                    when (perm.permission) {
+//                        android.Manifest.permission.CAMERA -> {
+//                            when {
+//                                perm.status.isGranted -> {
+//                                    Log.d("P", "PERMISSION GRANTED")
+//                                    Text("Camera permission accepted")
+//
+//                                }
+//
+//                                perm.status.shouldShowRationale -> {
+//                                    Log.d("P", "PERMISSION NEEDED")
+//                                    Text("Camera permission is needed to access camera")
+//                                }
+//
+//                                !perm.isPermanentlyDenied() -> {
+//                                    Log.d("P", "PERMISSION DENIED")
+//                                    Text("Camera permission was permanently denied.You can enable it in app settings.")
+//                                }
+//                            }
+//                        }
+//
+//                        android.Manifest.permission.RECORD_AUDIO -> {
+//                            when {
+//                                perm.status.isGranted -> {
+//                                    Log.d("P", "PERMISSION GRANTED")
+//                                    Text("Record permission accepted")
+//
+//                                }
+//
+//                                perm.status.shouldShowRationale -> {
+//                                    Log.d("P", "PERMISSION NEEDED")
+//                                    Text("Record permission is needed to access camera")
+//                                }
+//
+//                                !perm.isPermanentlyDenied() -> {
+//                                    Log.d("P", "PERMISSION DENIED")
+//                                    Text("Record permission was permanently denied.You can enable it in app settings.")
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//
+//        }
+
+
+
+        //Drawer in COmpose
         setContent {
-//            MultiplePermissionsHandler()
+            Scaffold() {
 
-            val permissionsState = rememberMultiplePermissionsState(
-                permissions = listOf(
-                    android.Manifest.permission.CAMERA,
-                    android.Manifest.permission.RECORD_AUDIO
-                )
-            )
-            val lifecycleOwner = LocalLifecycleOwner.current
-            DisposableEffect(
-                key1 = lifecycleOwner,
-                effect = {
-                    val observer = LifecycleEventObserver { _, event ->
-                        if (event == Lifecycle.Event.ON_RESUME) {
-                            permissionsState.launchMultiplePermissionRequest()
-                        }
-                    }
-                    lifecycleOwner.lifecycle.addObserver(observer)
-                    onDispose {
-                        lifecycleOwner.lifecycle.removeObserver(observer)
-                    }
-                }
-
-            )
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                permissionsState.permissions.forEach { perm ->
-                    when (perm.permission) {
-                        android.Manifest.permission.CAMERA -> {
-                            when {
-                                perm.status.isGranted -> {
-                                    Log.d("P", "PERMISSION GRANTED")
-                                    Text("Camera permission accepted")
-
-                                }
-
-                                perm.status.shouldShowRationale -> {
-                                    Log.d("P", "PERMISSION NEEDED")
-                                    Text("Camera permission is needed to access camera")
-                                }
-
-                                !perm.isPermanentlyDenied() -> {
-                                    Log.d("P", "PERMISSION DENIED")
-                                    Text("Camera permission was permanently denied.You can enable it in app settings.")
-                                }
-                            }
-                        }
-
-                        android.Manifest.permission.RECORD_AUDIO -> {
-                            when {
-                                perm.status.isGranted -> {
-                                    Log.d("P", "PERMISSION GRANTED")
-                                    Text("Record permission accepted")
-
-                                }
-
-                                perm.status.shouldShowRationale -> {
-                                    Log.d("P", "PERMISSION NEEDED")
-                                    Text("Record permission is needed to access camera")
-                                }
-
-                                !perm.isPermanentlyDenied() -> {
-                                    Log.d("P", "PERMISSION DENIED")
-                                    Text("Record permission was permanently denied.You can enable it in app settings.")
-                                }
-                            }
-                        }
-                    }
-                }
             }
-
         }
-
     }
+
+    //Drawer in COmpose
+
+
 
     //Permission Handling
 //    @OptIn(ExperimentalPermissionsApi::class)
