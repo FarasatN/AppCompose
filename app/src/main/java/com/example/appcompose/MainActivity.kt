@@ -9,22 +9,37 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.isGranted
-import com.google.accompanist.permissions.rememberMultiplePermissionsState
-import com.google.accompanist.permissions.shouldShowRationale
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.*
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.*
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
-    @OptIn(ExperimentalPermissionsApi::class)
+    //    @OptIn(ExperimentalPermissionsApi::class)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -609,17 +624,201 @@ class MainActivity : ComponentActivity() {
 //        }
 
 
+        //Drawer in Compose
+//        setContent {
+//            val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+//            val coroutineScope = rememberCoroutineScope()
+//            Scaffold(
+////                drawerState = drawerState,
+//                topBar = {
+//                    AppBar(
+//                        onNavigationItemClick = {}
+//                    )
+//                },
+//                content = {
+//                    DrawerHeader()
+//                    DrawerBody(
+//                      items = listOf(
+//                          MenuItem(
+//                              id = "home",
+//                              title = "Home",
+//                              contentDescription = "Go to home screen",
+//                              icon = Icons.Default.Home
+//                          )
+//                      ),
+//                        onItemClick = {
+//                            when(it.id){
+//                                "home" -> "Navigate Home"
+//                            }
+//                            println("clicked on ${it.title}")
+//                        }
+//                    )
+//                }
+//            )
+//        }
 
-        //Drawer in COmpose
+
+        //Pagination
         setContent {
-            Scaffold() {
+            // Use MaterialTheme to wrap the PaginationExample
+            Surface(color = MaterialTheme.colorScheme.background) {
+                PaginationExample() // Call the composable
+//                PaginationList(loadMore = ::fetchData)
+            }
+        }
 
+    }
+
+    //Pagination 1
+    // Simulated data loading function
+    suspend fun fetchData(page: Int): List<String> {
+        delay(1500) // Simulate network delay
+        val pageSize = 20
+        val start = page * pageSize
+        return (start until start + pageSize).map { "Item $it" }
+    }
+
+    @Composable
+    fun PaginationList(
+        loadMore: suspend (Int) -> List<String>, // A suspend function to load data
+        contentPadding: PaddingValues = PaddingValues(16.dp)
+    ) {
+        val items = remember { mutableStateListOf<String>() } // List to store items
+        val isLoading = remember { mutableStateOf(false) } // Loading state
+        var page by remember { mutableStateOf(0) } // Tracks the current page
+        val coroutineScope = rememberCoroutineScope()
+        // Load initial data
+        LaunchedEffect(Unit) {
+            loadPage(page, items, isLoading, loadMore)
+        }
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = contentPadding
+        ) {
+            // Display each item
+            items(items) { item ->
+                Text(
+                    text = item,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+            // Show a loading spinner at the bottom when fetching data
+            if (isLoading.value) {
+                item {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                            .wrapContentWidth()
+                    )
+                }
+            }
+        }
+        // Trigger loading more items when reaching the end
+        LaunchedEffect(items.size) {
+            if (!isLoading.value) {
+                coroutineScope.launch {
+                    loadPage(++page, items, isLoading, loadMore)
+                }
             }
         }
     }
 
-    //Drawer in COmpose
+    private suspend fun loadPage(
+        page: Int,
+        items: MutableList<String>,
+        isLoading: MutableState<Boolean>,
+        loadMore: suspend (Int) -> List<String>
+    ) {
+        if (isLoading.value) return
+        isLoading.value = true
+        val newItems = loadMore(page) // Call the provided function to load data
+        items.addAll(newItems)
+        isLoading.value = false
+    }
 
+    //Pagination 1
+//-------------------------------------------------
+    @OptIn(ExperimentalMaterial3Api::class)
+    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+    @Composable
+    fun PaginationExample() {
+        val items = remember { mutableStateListOf<Int>() } // List to store the data
+        val isLoading = remember { mutableStateOf(false) } // Loading state
+        val coroutineScope = rememberCoroutineScope()
+
+        // Load initial data
+        LaunchedEffect(Unit) {
+            loadMoreItems(items, isLoading)
+        }
+
+        Scaffold(
+            topBar = {
+                TopAppBar(title = { Text("Pagination Example") })
+            }
+        ) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
+                // Display the items
+                items(items) { item ->
+                    Text(
+                        text = "Item $item",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                    )
+                }
+
+                // Show a loading spinner at the bottom when more items are loading
+                if (isLoading.value) {
+                    item {
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                                .wrapContentWidth()
+                        )
+                    }
+                }
+            }
+
+            // Detect if the user has scrolled to the bottom and load more items
+            LazyColumnStateListener(items.size, isLoading.value) {
+                coroutineScope.launch {
+                    loadMoreItems(items, isLoading)
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun LazyColumnStateListener(itemCount: Int, isLoading: Boolean, onLoadMore: () -> Unit) {
+        LaunchedEffect(itemCount, isLoading) {
+            if (!isLoading && itemCount > 0) {
+                onLoadMore()
+            }
+        }
+    }
+
+    // Simulate loading more items
+    suspend fun loadMoreItems(items: MutableList<Int>, isLoading: MutableState<Boolean>) {
+        if (isLoading.value) return // Prevent duplicate loads
+        isLoading.value = true
+        delay(2000) // Simulate a network delay
+        val start = items.size
+        val end = start + 20
+        items.addAll(start until end)
+        isLoading.value = false
+    }
+
+
+    //Drawer in Compose
 
 
     //Permission Handling

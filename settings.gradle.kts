@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "AppCompose"
 include(":app")
- 
+include(":Practice")

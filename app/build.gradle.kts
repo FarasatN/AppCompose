@@ -1,6 +1,18 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+//    id("com.google.devtools.ksp")
+//    id("com.google.devtools.ksp") version "1.9.0-1.0.11" // Replace with the latest version
+}
+kotlin{
+    sourceSets{
+        debug{
+            kotlin.srcDirs("build/generated/ksp/debug/kotlin")
+        }
+        release{
+            kotlin.srcDirs("build/generated/ksp/release/kotlin")
+        }
+    }
 }
 
 android {
@@ -76,6 +88,11 @@ dependencies {
     implementation(libs.androidx.constraintlayout.compose)
 
     implementation(libs.androidx.navigation.compose)
-    implementation(libs.accompanist.permissions)
-}
 
+
+//    implementation(libs.core)
+//    ksp("io.github.raamcosta.compose-destinations:ksp:1.9.0-beta")
+
+// V2 only: for bottom sheet destination support, also add
+//    implementation(libs.bottom.sheet)
+}
