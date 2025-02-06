@@ -88,6 +88,7 @@ dependencies {
     implementation(libs.androidx.constraintlayout.compose)
 
     implementation(libs.androidx.navigation.compose)
+//    implementation(libs.androidx.material.icons.extended) // Use latest version
 
 
 //    implementation(libs.core)

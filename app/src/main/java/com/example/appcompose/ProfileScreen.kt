@@ -162,7 +162,7 @@ fun TopBar(
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceAround,
-        modifier = Modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth()
     ) {
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
