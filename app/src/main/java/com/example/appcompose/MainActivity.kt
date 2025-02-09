@@ -7,11 +7,14 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -738,7 +741,9 @@ class MainActivity : ComponentActivity() {
             shape = RoundedCornerShape(corner = CornerSize(8.dp)),
             border = BorderStroke(width = 2.dp, color = Color.LightGray)
         ) {
-            Column {
+            Column(modifier = Modifier.padding(6.dp),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.Start) {
                 InputField(valueState = totalBillState,
                     labelId = "Enter Bill",
                     enabled = true,
@@ -750,6 +755,23 @@ class MainActivity : ComponentActivity() {
                         keyboardController?.hide()
                     }
                 )
+                if(validState) {
+                    Row(modifier = Modifier
+                        .padding(3.dp),
+                        horizontalArrangement = Arrangement.Start){
+                        Text("Split",
+                            modifier = Modifier.align(alignment = Alignment.CenterVertically))
+                        Spacer(modifier = Modifier.width(120.dp))
+                        Row(modifier = Modifier.padding(horizontal = 3.dp),
+                            horizontalArrangement = Arrangement.End) {
+
+                        }
+                    }
+                }else{
+                    Box(){
+
+                    }
+                }
             }
         }
     }
