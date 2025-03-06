@@ -1,14 +1,9 @@
 package com.example.appcompose
 
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.content.Context
-import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,54 +18,27 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.ExistingWorkPolicy
-import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
-import androidx.work.workDataOf
 import com.example.appcompose.components.InputField
-import com.example.mydrivesyncapp.FileUploadWorker
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.common.api.Scope
-import com.google.api.client.extensions.android.http.AndroidHttp
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
-import com.google.api.client.http.InputStreamContent
-import com.google.api.client.json.gson.GsonFactory
-import com.google.api.services.drive.Drive
-import com.google.api.services.drive.DriveScopes
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.io.InputStream
-import java.util.concurrent.TimeUnit
+import widgets.IconbuttonSizeModifier
+import widgets.RoundIconButton
 
 
 class MainActivity : ComponentActivity() {
@@ -705,195 +673,25 @@ class MainActivity : ComponentActivity() {
 
         //*******************************************************************************************
         //JetTip App
-//        setContent {
-//            Column {
-//                TopHeader()
-//                Spacer(modifier = Modifier.padding(4.dp))
-//                JetTip {
-//                    MainContent()
-//                }
-//            }
-//        }
+        setContent {
+            Column {
+                TopHeader()
+                Spacer(modifier = Modifier.padding(4.dp))
+                JetTip {
+                    MainContent()
+                }
+            }
+        }
 
 
 //-----------------
-    //Auto-Upload
-    setContent {
-        MainScreen2()
-    }
+//    //Auto-Upload
+//    setContent {
+//        MainScreen2()
+//    }
 
 
 }
-
-//------------------
-@Preview
-@Composable
-fun MainScreen2() {
-    val context = LocalContext.current
-    var account by remember { mutableStateOf(GoogleSignIn.getLastSignedInAccount(context)) }
-    var selectedFileUri by remember { mutableStateOf<Uri?>(null) }
-    val coroutineScope = rememberCoroutineScope()
-    val signInLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-            try {
-                val signedInAccount = task.getResult(ApiException::class.java)
-                println("Signed in as: ${signedInAccount.email}")
-                account = signedInAccount
-            } catch (e: ApiException) {
-                println("Sign in failed: ${e.localizedMessage}")
-            }
-        }
-    }
-
-    val filePickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        if (uri != null) {
-            println("File selected: $uri")
-            selectedFileUri = uri
-            account?.let { acc ->
-//                uploadFileToDrive(context, acc, uri)
-                coroutineScope.launch {
-                    uploadFileToDrive(context, acc, uri)
-                }
-            }
-        } else {
-            println("No file selected.")
-        }
-    }
-
-    if (account == null) {
-        LaunchedEffect(Unit) {
-            val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .requestScopes(Scope(DriveScopes.DRIVE_FILE))
-                .build()
-            val googleSignInClient = GoogleSignIn.getClient(context, gso)
-            signInLauncher.launch(googleSignInClient.signInIntent)
-        }
-    } else {
-        Button(onClick = { filePickerLauncher.launch("*/*") }) {
-            Text("Select a file to upload")
-        }
-    }
-}
-
-    suspend fun uploadFileToDrive(context: Context, account: GoogleSignInAccount, fileUri: Uri) {
-        withContext(Dispatchers.IO) {
-            val credential = GoogleAccountCredential.usingOAuth2(
-                context,
-                listOf(DriveScopes.DRIVE_FILE)
-            ).apply {
-                selectedAccount = account.account
-            }
-
-            val driveService = Drive.Builder(
-                AndroidHttp.newCompatibleTransport(),
-                GsonFactory.getDefaultInstance(),
-                credential
-            ).setApplicationName("MyDriveApp")
-                .build()
-
-            val inputStream: InputStream? = context.contentResolver.openInputStream(fileUri)
-            inputStream?.use { stream ->
-                val mediaContent = InputStreamContent("application/octet-stream", stream)
-                val fileMetadata = com.google.api.services.drive.model.File().apply {
-                    name = "UploadedFile"
-                }
-
-                try {
-                    val file = driveService.files().create(fileMetadata, mediaContent)
-                        .setFields("id")
-                        .execute()
-                    println("File ID: ${file.id}")
-                } catch (e: Exception) {
-                    println("Error uploading file: ${e.localizedMessage}")
-                }
-            }
-        }
-    }
-
- //=========
-@Composable
-fun MainScreen() {
-    val context = LocalContext.current
-
-    // Hold the signed-in account as mutable state so UI can update.
-    var account by remember { mutableStateOf(GoogleSignIn.getLastSignedInAccount(context)) }
-
-    // Launcher for Google sign-in.
-    val signInLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-            try {
-                val signedInAccount = task.getResult(ApiException::class.java)
-                println("Signed in as: ${signedInAccount.email}")
-                account = signedInAccount  // update state
-            } catch (e: ApiException) {
-                println("Sign in failed: ${e.localizedMessage}")
-            }
-        }
-    }
-
-    // Launcher for file picker. We use GetContent to allow the user to select any file.
-    val filePickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        if (uri != null) {
-            println("File selected: $uri")
-            // Schedule the file upload using the selected file URI.
-            scheduleFileUpload(context, uri)
-        } else {
-            println("No file selected.")
-        }
-    }
-
-    // If there is no signed-in account, trigger sign-in.
-    if (account == null) {
-        LaunchedEffect(Unit) {
-            val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .requestScopes(Scope(DriveScopes.DRIVE_FILE))
-                .build()
-            val googleSignInClient = GoogleSignIn.getClient(context, gso)
-            signInLauncher.launch(googleSignInClient.signInIntent)
-        }
-    } else {
-        // Once signed in, trigger the file picker.
-        LaunchedEffect(account) {
-            filePickerLauncher.launch("*/*") // Adjust MIME type if you want to restrict file types.
-        }
-        // Display signed-in info (or you can show progress)
-        Text(text = "Signed in as: ${account!!.email}", style = MaterialTheme.typography.bodyLarge)
-    }
-}
-
-    fun scheduleFileUpload(context: Context, fileUri: Uri) {
-        val inputData = workDataOf("FILE_URI" to fileUri.toString())
-        val uploadWorkRequest = OneTimeWorkRequestBuilder<FileUploadWorker>()
-            .setInputData(inputData)
-            .setConstraints(
-                androidx.work.Constraints.Builder()
-                    .setRequiredNetworkType(androidx.work.NetworkType.CONNECTED)
-                    .build()
-            )
-            .build()
-
-        WorkManager.getInstance(context).enqueueUniqueWork(
-            "DriveFileUploadWork",
-            ExistingWorkPolicy.REPLACE,
-            uploadWorkRequest
-        )
-    }
-
-    //------------------
-
-
 
     //JetTip App
     @Composable
@@ -903,7 +701,7 @@ fun MainScreen() {
         }
     }
 
-    //@Preview
+    @Preview
     @Composable
     fun TopHeader(totalPerson: Double = 134.0){
         Surface(
@@ -930,7 +728,7 @@ fun MainScreen() {
         }
     }
 
-    //@Preview
+    @Preview
     @Composable
     fun MainContent(){
         BillForm(){billAmt ->
@@ -978,7 +776,14 @@ fun MainScreen() {
                         Spacer(modifier = Modifier.width(120.dp))
                         Row(modifier = Modifier.padding(horizontal = 3.dp),
                             horizontalArrangement = Arrangement.End) {
-
+                            RoundIconButton(
+                                imageVector = Icons.Default.Close,
+                                onClick = {},
+                                )
+                            RoundIconButton(
+                                imageVector = Icons.Default.Add,
+                                onClick = {},
+                                )
                         }
                     }
                 }else{
@@ -990,7 +795,7 @@ fun MainScreen() {
         }
     }
 
-    //@Preview(showBackground = true, showSystemUi = true)
+    @Preview(showBackground = true, showSystemUi = true)
     @Composable
     fun DefaultPreview(){
         Column {
@@ -2197,6 +2002,181 @@ fun MainScreen() {
 //            else -> R.drawable.ic_launcher_foreground
 //        }
 //    }
+
+
+
+
+    //********************************************************************
+
+    /*
+//------------------
+@Preview
+@Composable
+fun MainScreen2() {
+val context = LocalContext.current
+var account by remember { mutableStateOf(GoogleSignIn.getLastSignedInAccount(context)) }
+var selectedFileUri by remember { mutableStateOf<Uri?>(null) }
+val coroutineScope = rememberCoroutineScope()
+val signInLauncher = rememberLauncherForActivityResult(
+    contract = ActivityResultContracts.StartActivityForResult()
+) { result ->
+    if (result.resultCode == Activity.RESULT_OK) {
+        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+        try {
+            val signedInAccount = task.getResult(ApiException::class.java)
+            println("Signed in as: ${signedInAccount.email}")
+            account = signedInAccount
+        } catch (e: ApiException) {
+            println("Sign in failed: ${e.localizedMessage}")
+        }
+    }
+}
+
+val filePickerLauncher = rememberLauncherForActivityResult(
+    contract = ActivityResultContracts.GetContent()
+) { uri: Uri? ->
+    if (uri != null) {
+        println("File selected: $uri")
+        selectedFileUri = uri
+        account?.let { acc ->
+//                uploadFileToDrive(context, acc, uri)
+            coroutineScope.launch {
+                uploadFileToDrive(context, acc, uri)
+            }
+        }
+    } else {
+        println("No file selected.")
+    }
+}
+
+if (account == null) {
+    LaunchedEffect(Unit) {
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestEmail()
+            .requestScopes(Scope(DriveScopes.DRIVE_FILE))
+            .build()
+        val googleSignInClient = GoogleSignIn.getClient(context, gso)
+        signInLauncher.launch(googleSignInClient.signInIntent)
+    }
+} else {
+    //Button(onClick = { filePickerLauncher.launch("") }) {
+        Text("Select a file to upload")
+    }
+}
+}
+
+suspend fun uploadFileToDrive(context: Context, account: GoogleSignInAccount, fileUri: Uri) {
+    withContext(Dispatchers.IO) {
+        val credential = GoogleAccountCredential.usingOAuth2(
+            context,
+            listOf(DriveScopes.DRIVE_FILE)
+        ).apply {
+            selectedAccount = account.account
+        }
+
+        val driveService = Drive.Builder(
+            AndroidHttp.newCompatibleTransport(),
+            GsonFactory.getDefaultInstance(),
+            credential
+        ).setApplicationName("MyDriveApp")
+            .build()
+
+        val inputStream: InputStream? = context.contentResolver.openInputStream(fileUri)
+        inputStream?.use { stream ->
+            val mediaContent = InputStreamContent("application/octet-stream", stream)
+            val fileMetadata = com.google.api.services.drive.model.File().apply {
+                name = "UploadedFile"
+            }
+
+            try {
+                val file = driveService.files().create(fileMetadata, mediaContent)
+                    .setFields("id")
+                    .execute()
+                println("File ID: ${file.id}")
+            } catch (e: Exception) {
+                println("Error uploading file: ${e.localizedMessage}")
+            }
+        }
+    }
+}
+
+//=========
+@Composable
+fun MainScreen() {
+val context = LocalContext.current
+
+// Hold the signed-in account as mutable state so UI can update.
+var account by remember { mutableStateOf(GoogleSignIn.getLastSignedInAccount(context)) }
+
+// Launcher for Google sign-in.
+val signInLauncher = rememberLauncherForActivityResult(
+    contract = ActivityResultContracts.StartActivityForResult()
+) { result ->
+    if (result.resultCode == Activity.RESULT_OK) {
+        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+        try {
+            val signedInAccount = task.getResult(ApiException::class.java)
+            println("Signed in as: ${signedInAccount.email}")
+            account = signedInAccount  // update state
+        } catch (e: ApiException) {
+            println("Sign in failed: ${e.localizedMessage}")
+        }
+    }
+}
+
+// Launcher for file picker. We use GetContent to allow the user to select any file.
+val filePickerLauncher = rememberLauncherForActivityResult(
+    contract = ActivityResultContracts.GetContent()
+) { uri: Uri? ->
+    if (uri != null) {
+        println("File selected: $uri")
+        // Schedule the file upload using the selected file URI.
+        scheduleFileUpload(context, uri)
+    } else {
+        println("No file selected.")
+    }
+}
+
+// If there is no signed-in account, trigger sign-in.
+if (account == null) {
+    LaunchedEffect(Unit) {
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestEmail()
+            .requestScopes(Scope(DriveScopes.DRIVE_FILE))
+            .build()
+        val googleSignInClient = GoogleSignIn.getClient(context, gso)
+        signInLauncher.launch(googleSignInClient.signInIntent)
+    }
+} else {
+    // Once signed in, trigger the file picker.
+    LaunchedEffect(account) {
+        filePickerLauncher.launch("") // Adjust MIME type if you want to restrict file types.
+    }
+    // Display signed-in info (or you can show progress)
+    Text(text = "Signed in as: ${account!!.email}", style = MaterialTheme.typography.bodyLarge)
+}
+}
+
+fun scheduleFileUpload(context: Context, fileUri: Uri) {
+    val inputData = workDataOf("FILE_URI" to fileUri.toString())
+    val uploadWorkRequest = OneTimeWorkRequestBuilder<FileUploadWorker>()
+        .setInputData(inputData)
+        .setConstraints(
+            androidx.work.Constraints.Builder()
+                .setRequiredNetworkType(androidx.work.NetworkType.CONNECTED)
+                .build()
+        )
+        .build()
+
+    WorkManager.getInstance(context).enqueueUniqueWork(
+        "DriveFileUploadWork",
+        ExistingWorkPolicy.REPLACE,
+        uploadWorkRequest
+    )
+}
+
+//------------------
+*/
 
 
 }
