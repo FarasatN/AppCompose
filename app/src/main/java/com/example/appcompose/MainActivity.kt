@@ -2,6 +2,8 @@ package com.example.appcompose
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
+import android.widget.Space
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
@@ -23,6 +25,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -708,6 +711,7 @@ class MainActivity : ComponentActivity() {
             color = Color.LightGray,
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(20.dp)
                 .height(150.dp)
 //                .clip(shape = RoundedCornerShape(corner = CornerSize(12.dp)))
                 .clip(shape = CircleShape.copy(all = CornerSize(12.dp)))
@@ -746,7 +750,10 @@ class MainActivity : ComponentActivity() {
             totalBillState.value.trim().isNotEmpty()
         }
         val keyboardController = LocalSoftwareKeyboardController.current
-
+        val sliderPositionState =  remember{
+            mutableStateOf(0f)
+        }
+        TopHeader()
         Surface(modifier = Modifier
             .padding(2.dp)
             .fillMaxWidth(),
@@ -767,7 +774,7 @@ class MainActivity : ComponentActivity() {
                         keyboardController?.hide()
                     }
                 )
-                if(validState) {
+//                if(validState) {
                     Row(modifier = Modifier
                         .padding(3.dp),
                         horizontalArrangement = Arrangement.Start){
@@ -786,11 +793,32 @@ class MainActivity : ComponentActivity() {
                                 )
                         }
                     }
-                }else{
-                    Box(){
-
+                    //Tip Row
+                    Row(modifier = Modifier
+                        .padding(horizontal = 3.dp, vertical = 12.dp)){
+                        Text(text = "Tip", modifier = Modifier.align(Alignment.CenterVertically))
+                        Spacer(modifier = Modifier.width(200.dp))
+                        Text(text = "$33.00", modifier = Modifier.align(Alignment.CenterVertically))
                     }
-                }
+                    Column(verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(text = "33%")
+                        Spacer(modifier = Modifier.height(14.dp))
+                        //Slider
+                        Slider(value = sliderPositionState.value,
+                            onValueChange = {newVal->
+                            sliderPositionState.value = newVal
+                            Log.d("Slider", "BillForm: $newVal")
+                            },
+                            modifier = Modifier.padding(start = 16.dp, end = 16.dp),
+                            steps = 5)
+                    }
+
+//                }else{
+//                    Box(){
+//
+//                    }
+//                }
             }
         }
     }
