@@ -753,6 +753,12 @@ class MainActivity : ComponentActivity() {
         val sliderPositionState =  remember{
             mutableStateOf(0f)
         }
+        val tipPercentage  = (sliderPositionState.value * 100).toInt()
+
+        val splitByState = remember{
+            mutableStateOf(1)
+        }
+        val range = IntRange(start = 1, endInclusive = 100)
         TopHeader()
         Surface(modifier = Modifier
             .padding(2.dp)
@@ -785,11 +791,20 @@ class MainActivity : ComponentActivity() {
                             horizontalArrangement = Arrangement.End) {
                             RoundIconButton(
                                 imageVector = Icons.Default.Close,
-                                onClick = {},
+                                onClick = {
+                                    splitByState.value =
+                                        if (splitByState.value>1) splitByState.value-1
+                                        else 1
+                                },
                                 )
+                            Text(text = "${splitByState.value}",
+                                modifier = Modifier.align(Alignment.CenterVertically)
+                                    .padding(start = 9.dp,end = 9.dp))
                             RoundIconButton(
                                 imageVector = Icons.Default.Add,
-                                onClick = {},
+                                onClick = {
+                                    if(splitByState.value<range.last) splitByState.value+=1
+                                },
                                 )
                         }
                     }
@@ -802,7 +817,7 @@ class MainActivity : ComponentActivity() {
                     }
                     Column(verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(text = "33%")
+                        Text(text = "${tipPercentage} %")
                         Spacer(modifier = Modifier.height(14.dp))
                         //Slider
                         Slider(value = sliderPositionState.value,
