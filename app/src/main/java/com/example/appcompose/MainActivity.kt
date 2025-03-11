@@ -759,6 +759,9 @@ class MainActivity : ComponentActivity() {
             mutableStateOf(1)
         }
         val range = IntRange(start = 1, endInclusive = 100)
+        val tipAmountState = remember{
+            mutableStateOf(0.0)
+        }
         TopHeader()
         Surface(modifier = Modifier
             .padding(2.dp)
@@ -813,7 +816,7 @@ class MainActivity : ComponentActivity() {
                         .padding(horizontal = 3.dp, vertical = 12.dp)){
                         Text(text = "Tip", modifier = Modifier.align(Alignment.CenterVertically))
                         Spacer(modifier = Modifier.width(200.dp))
-                        Text(text = "$33.00", modifier = Modifier.align(Alignment.CenterVertically))
+                        Text(text = "$ ${tipAmountState.value}", modifier = Modifier.align(Alignment.CenterVertically))
                     }
                     Column(verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally) {
@@ -823,7 +826,7 @@ class MainActivity : ComponentActivity() {
                         Slider(value = sliderPositionState.value,
                             onValueChange = {newVal->
                             sliderPositionState.value = newVal
-                            Log.d("Slider", "BillForm: $newVal")
+                            tipAmountState.value = calculateTotalTip(totalBill = totalBillState.value.toDouble(),tipPercentage = tipPercentage)
                             },
                             modifier = Modifier.padding(start = 16.dp, end = 16.dp),
                             steps = 5)
@@ -837,6 +840,16 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    fun calculateTotalTip(totalBill: Double, tipPercentage: Int): Double {
+        return if (totalBill > 1 && totalBill.toString().isNotEmpty())
+            (totalBill * tipPercentage) / 100
+        else 0.0
+    }
+
+    fun calculateTotalPerPerson(
+
+    )
 
     @Preview(showBackground = true, showSystemUi = true)
     @Composable
